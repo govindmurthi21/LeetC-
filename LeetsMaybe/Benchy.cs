@@ -14,8 +14,8 @@ public class Benchy
     }
 
     [Benchmark()]
-    public void BenchyCheckDecomposeWithJagged()
+    public void BenchyCheckDecomposeFasterDecompose()
     {
-        new MaxOddDecomp().DecomposeWithJaggedArray(this.N);
+        new MaxOddDecomp().FasterDecompose(this.N);
     }
 }

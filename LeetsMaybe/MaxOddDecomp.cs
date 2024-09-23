@@ -51,59 +51,59 @@ public struct MaxOddDecomp
         return result.Sum() == N ? result.ToArray() : new int[1] {N};
     }
     
-    /// <summary>
-    /// TODO: Check lowered code in SharpLabIO.
-    /// </summary>
-    /// <param name="N"></param>
-    /// <returns></returns>
-    public int[] DecomposeWithJaggedArray(int N) //Somehow more memory is allocated. Strange. Might have to
+    public int[] FasterDecompose(int N)
     {
         if (N is <= 0 or 2)
         {
             return Array.Empty<int>();
         }
 
-        int oddNumb = 1;
-        var decompDict = new int[N/2][];
-        int remainder = N;
-        int jaggedCount = 0;
-        
+        var arr = new List<int>();
+        var oddNumb = 1;
+        var total = 0;
+
         while (true)
         {
-            remainder -= oddNumb;
-            if (remainder <= 0) break;
-            decompDict[jaggedCount++] = new[] {oddNumb, remainder};
+            total += oddNumb;
+            if (total > N) break;
+            arr.Add(oddNumb);
             oddNumb += 2;
         }
+        
+        if (total == N) return arr.ToArray();
 
-        if (decompDict.Length == 0)
+        var len = arr.Count;
+
+        if (len == 1)
         {
             return N % 2 == 0 ? Array.Empty<int>() : new int[1] { N };
         }
 
-        int runningSum = 0;
-        var result = new List<int>();
+        if (arr.Sum() == N) return arr.ToArray();
 
-        foreach (var item in decompDict)
+        var calculate = (int total, int oddElem) =>
         {
-            var key = item[0];
-            var val = item[1];
-            runningSum += key;
-            result.Add(key);
-            
-            if (val % 2 == 0) continue;
-
-            if (key + val == N)
+            while (total < N)
             {
-                result.Add(val);
+                total += 2;
+                oddElem += 2;
+            }
+
+            return total == N ? oddElem : -1;
+        };
+
+        while (len > 0)
+        {
+            arr = arr.Take(len).ToList();
+            var val = calculate(arr.Sum(), arr[len - 1]);
+            if (val > -1)
+            {
+                arr[len - 1] = val;
                 break;
             }
-            
-            if (val <= key || runningSum + val != N) continue;
-            result.Add(val);
-            break;
-        }
 
-        return result.Sum() == N ? result.ToArray() : new int[1] {N};
+            len += val;
+        }
+        return arr.ToArray();
     }
 }
